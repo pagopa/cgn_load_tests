@@ -1,9 +1,9 @@
 # Load tests for CGN project
 
-This is a set of [k6](https://k6.io) load test related to the CGN (carta giovani nazionale) initiative
+This is a set of [k6](https://k6.io) load tests related to the CGN (carta giovani nazionale) initiative
 
 
-## Acticate new cards based on a random "valid" fiscal code.
+## Activate new cards based on random "valid" fiscal codes.
 
 You need to set an environment variable `FUNC_KEY` with the azure function app key.
 
