@@ -16,9 +16,9 @@ export let options = {
 export default function () {
 
   // fake fiscal code.
-  const fiscalCode = 'ZFUKNL98A72Y081X'
+  const fiscalCode = 'VAFLAS61A52Y324X'
 
-  var url = `https://io-p-func-cgn.azurewebsites.net/api/v1/cgn/status/${fiscalCode}`;
+  var url = `https://io-p-func-cgn.azurewebsites.net/api/v1/cgn/${fiscalCode}/activation`;
 
   var funcKey = `${__ENV.FUNC_KEY}`
 
@@ -34,4 +34,6 @@ export default function () {
   check(r, {
     'status is 200': (r) => r.status === 200,
   });
+
+  console.log('Status: ' + r.status);
 }
