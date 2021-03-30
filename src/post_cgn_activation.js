@@ -1,11 +1,23 @@
 import http from 'k6/http';
-import { check, sleep} from 'k6';
+import { check } from 'k6';
 import { generateFakeFiscalCode } from './modules/helpers.js';
 
+/*
 export let options = {
   // virtual users
   vus: 10,
   duration: '30s',
+};
+*/
+
+export let options = {
+  stages: [
+    { duration: '1m', target: 100 }, // simulate ramp-up of traffic from 1 to 100 users over 5 minutes.
+  ],
+  thresholds: {
+    http_req_duration: ['p(99)<1500'], // 99% of requests must complete below 1.5s
+    'logged in successfully': ['p(99)<1500'], // 99% of requests must complete below 1.5s
+  },
 };
 
 export default function () {
