@@ -36,3 +36,21 @@ $ docker run -i --rm -v $(pwd)/src:/src  -e FUNC_KEY=${FUNC_KEY} loadimpact/k6 r
 ```
 $ docker run -i --rm -v $(pwd)/src:/src  -e FUNC_KEY=${FUNC_KEY} loadimpact/k6 run /src/upsert_cgn_status.js
 ```
+
+## 05. Generate OTP
+
+* It generates a new opt for a given fiscal code.
+* You need to set an environment variable `FUNC_KEY` with the azure function app key.
+
+```
+docker run -i --rm -v $(pwd)/src:/src  -e FUNC_KEY=${FUNC_KEY} loadimpact/k6 run /src/generate_otp.js
+```
+
+## 06. Validate OTP
+
+* It validates a generated **OTP**: an OTP has 10 minutes validity after it has been generated.
+* You need to set an environment variable `FUNC_KEY` with the azure function app key.
+
+```
+docker run -i --rm -v $(pwd)/src:/src  -e FUNC_KEY=${FUNC_KEY} loadimpact/k6 run /src/validate_otp.js
+```
