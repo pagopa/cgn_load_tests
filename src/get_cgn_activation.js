@@ -35,5 +35,5 @@ export default function () {
     'status is 200': (r) => r.status === 200,
   });
 
-  console.log('Status: ' + r.status);
+  // console.log('Status: ' + r.status);
 }
