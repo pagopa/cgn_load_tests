@@ -102,32 +102,30 @@ export default function () {
         var r = merchantOtpCheck(otp, 0, urlBaseMerchantPath, funcMerchantKey);
         check(r, { 'status is 400': (r) => r.status === 400 }, tag);
     }
-    else {
-        // OTP generation.
-        var url = `${urlBasePath}/api/v1/cgn/otp/${fiscalCode}`;
-        var funcKey = `${__ENV.FUNC_KEY}`
-        var otp = otpGeneration(fiscalCode, url, funcKey)
+
+    // OTP generation.
+    var url = `${urlBasePath}/api/v1/cgn/otp/${fiscalCode}`;
+    var funcKey = `${__ENV.FUNC_KEY}`
+    var otp = otpGeneration(fiscalCode, url, funcKey)
 
 
-        // Simulate waiting for OTP usage by the user when inserting the promo code while doing a checkout.
-        sleep(getRandomInt(1, 3))
+    // Simulate waiting for OTP usage by the user when inserting the promo code while doing a checkout.
+    sleep(getRandomInt(1, 3))
 
-        // Marchant calls API to check if OTP exists without invalidating the code itself.
-        var tag = {
-            pagoPaMethod: "OtpCheckNoInvalidate",
-        };
-        var r = merchantOtpCheck(otp, 0, urlBaseMerchantPath, funcMerchantKey);
-        check(r, { 'status is 200': (r) => r.status === 200 }, tag);
+    // Marchant calls API to check if OTP exists without invalidating the code itself.
+    var tag = {
+        pagoPaMethod: "OtpCheckNoInvalidate",
+    };
+    var r = merchantOtpCheck(otp, 0, urlBaseMerchantPath, funcMerchantKey);
+    check(r, { 'status is 200': (r) => r.status === 200 }, tag);
 
-        // Simulate waiting for OTP usage by the merchant when processing checkout.
-        sleep(getRandomInt(1, 3))
+    // Simulate waiting for OTP usage by the merchant when processing checkout.
+    sleep(getRandomInt(1, 3))
 
-        // Marchant calls API to consume the OTP.
-        r = merchantOtpCheck(otp, 1, urlBaseMerchantPath, funcMerchantKey);
-        check(r, { 'status is 200': (r) => r.status === 200 }, tag);
+    // Marchant calls API to consume the OTP.
+    r = merchantOtpCheck(otp, 1, urlBaseMerchantPath, funcMerchantKey);
+    check(r, { 'status is 200': (r) => r.status === 200 }, tag);
 
-
-    }
 
     console.log('Test completed for: ' + fiscalCode + ' OTP: ' + otp);
 
