@@ -1,5 +1,3 @@
-//docker run -i --rm -v $(pwd)/src:/src  -e FUNC_KEY=${FUNC_KEY} -e BASE_URL=${BASE_URL} loadimpact/k6 run /src/user_activate_card_workflow.js
-
 import http from 'k6/http';
 import { sleep } from 'k6';
 import { check } from 'k6';

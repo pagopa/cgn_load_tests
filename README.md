@@ -84,3 +84,21 @@ $ docker run -i --rm -v $(pwd)/src:/src  -e FUNC_KEY=${FUNC_KEY} loadimpact/k6 r
 ```
 $ docker run -i --rm -v $(pwd)/src:/src  -e FUNC_KEY=${FUNC_KEY} loadimpact/k6 run /src/start_eyca_activation.js
 ```
+
+# Full workloads
+
+## 01. Card activation
+
+This test represents the activation of a new card from the mobile app for a citizen.
+
+```
+$ docker run -i --rm -v $(pwd)/src:/src  -e FUNC_KEY=${FUNC_KEY} -e BASE_URL=${BASE_URL} loadimpact/k6 run /src/user_activate_card_workflow.js
+```
+
+## 02. OTP transaction
+
+This test represents the usage of an OTP when doing a transacation with a supported merchant.
+
+```
+$ docker run -i --rm -v $(pwd)/src:/src  -e FUNC_KEY=${FUNC_KEY} -e FUNC_MERCHANT_KEY=${FUNC_MERCHANT_KEY} -e BASE_URL=${BASE_URL} -e BASE_MERCHANT_URL=${BASE_MERCHANT_URL} loadimpact/k6 run /src/otp_workflow.js
+```
