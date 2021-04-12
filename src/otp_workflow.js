@@ -6,9 +6,7 @@ import { check } from 'k6';
 
 export let options = {
     vus: 1,
-    stages: [
-        { duration: '30s', target: 1 }, // simulate ramp-up of traffic from 1 to 100 users over 5 minutes.
-    ],
+    iterations: 20,
     thresholds: {
         http_req_duration: ['p(99)<1500'], // 99% of requests must complete below 1.5s
         'http_req_duration{pagoPaMethod:OtpGeneration}': ['p(95)<1000'], // threshold on API requests only
@@ -78,10 +76,10 @@ export default function () {
     // Known code for testing puroposes.
     const fiscalCode = "HXHIKW90A29Y010X"
     console.log('Fiscal code: ' + fiscalCode)
+    console.log(__ITER)
 
-
-    var random = getRandomInt(1, 100);
-    if (random == 100) {
+    var flipCoin = getRandomInt(1, 2);
+    if ((__ITER % 10 == 0) && flipCoin == 1) {
         // Simulating a cache miss on Redis for an expired token. (UGN0ILLIQH4) Every 100 tests (more or less...).
         console.log(`Cache miss simulation.`)
         var tag = {
@@ -91,8 +89,8 @@ export default function () {
         var r = merchantOtpCheck(otp, 0, urlBaseMerchantPath, funcMerchantKey);
         check(r, { 'status is 404': (r) => r.status === 404 }, tag);
     }
-    // Simulating an invalid OTP. Every 100 tests (more or less...).
-    else if (random == 99) {
+    // Simulating an invalid OTP. Every 200 tests (more or less...).
+    else if (__ITER % 10 == 0 && flipCoin == 2) {
         // Simulating an invalid OTP.
         console.log(`Invalid OTP simulation.`)
         var tag = {
@@ -101,35 +99,32 @@ export default function () {
         otp = "invalid"
         var r = merchantOtpCheck(otp, 0, urlBaseMerchantPath, funcMerchantKey);
         check(r, { 'status is 400': (r) => r.status === 400 }, tag);
-    }
-    else {
-
-        // OTP generation.
-        var url = `${urlBasePath}/api/v1/cgn/otp/${fiscalCode}`;
-        var funcKey = `${__ENV.FUNC_KEY}`
-        var otp = otpGeneration(fiscalCode, url, funcKey)
-
-
-        // Simulate waiting for OTP usage by the user when inserting the promo code while doing a checkout.
-        sleep(getRandomInt(1, 3))
-
-        // Marchant calls API to check if OTP exists without invalidating the code itself.
-        var tag = {
-            pagoPaMethod: "OtpCheckNoInvalidate",
-        };
-        var r = merchantOtpCheck(otp, 0, urlBaseMerchantPath, funcMerchantKey);
-        check(r, { 'status is 200': (r) => r.status === 200 }, tag);
-
-        // Simulate waiting for OTP usage by the merchant when processing checkout.
-        sleep(getRandomInt(1, 3))
-
-        // Marchant calls API to consume the OTP.
-        r = merchantOtpCheck(otp, 1, urlBaseMerchantPath, funcMerchantKey);
-        check(r, { 'status is 200': (r) => r.status === 200 }, tag);
-
+        console.log('Test completed for: ' + fiscalCode + ' OTP: ' + otp);
 
     }
+
+    // OTP generation.
+    var url = `${urlBasePath}/api/v1/cgn/otp/${fiscalCode}`;
+    var funcKey = `${__ENV.FUNC_KEY}`
+    var otp = otpGeneration(fiscalCode, url, funcKey)
+
+
+    // Simulate waiting for OTP usage by the user when inserting the promo code while doing a checkout.
+    sleep(getRandomInt(1, 3))
+
+    // Marchant calls API to check if OTP exists without invalidating the code itself.
+    var tag = {
+        pagoPaMethod: "OtpCheckNoInvalidate",
+    };
+    var r = merchantOtpCheck(otp, 0, urlBaseMerchantPath, funcMerchantKey);
+    check(r, { 'status is 200': (r) => r.status === 200 }, tag);
+
+    // Simulate waiting for OTP usage by the merchant when processing checkout.
+    sleep(getRandomInt(1, 3))
+
+    // Marchant calls API to consume the OTP.
+    r = merchantOtpCheck(otp, 1, urlBaseMerchantPath, funcMerchantKey);
+    check(r, { 'status is 200': (r) => r.status === 200 }, tag);
 
     console.log('Test completed for: ' + fiscalCode + ' OTP: ' + otp);
-
 }
