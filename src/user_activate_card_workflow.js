@@ -66,7 +66,7 @@ export default function () {
 
         // If status is "completed" then the card is activated.
         var jsonBody = JSON.parse(r.body);
-        if (jsonBody.status === 'COMPLETED') {
+        if (r.body && jsonBody.status === 'COMPLETED') {
             cardActivated = true;
             break;
         }

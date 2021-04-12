@@ -34,7 +34,9 @@ function otpGeneration(fiscalCode, url, funcKey) {
     });
     console.log("OTP generation for " + fiscalCode + ". Status " + r.status);
     check(r, { 'status is 200': (r) => r.status === 200 }, tag);
-    return JSON.parse(r.body).code;
+
+    if (r.body) return JSON.parse(r.body).code;
+    return "";
 }
 
 function merchantOtpCheck(otp, invalidate, urlBaseMerchantPath, funcMerchantKey, tag) {
@@ -99,31 +101,34 @@ export default function () {
         otp = "invalid"
         var r = merchantOtpCheck(otp, 0, urlBaseMerchantPath, funcMerchantKey);
         check(r, { 'status is 400': (r) => r.status === 400 }, tag);
-        console.log('Test completed for: ' + fiscalCode + ' OTP: ' + otp);
+    }
+    else {
+        // OTP generation.
+        var url = `${urlBasePath}/api/v1/cgn/otp/${fiscalCode}`;
+        var funcKey = `${__ENV.FUNC_KEY}`
+        var otp = otpGeneration(fiscalCode, url, funcKey)
+
+
+        // Simulate waiting for OTP usage by the user when inserting the promo code while doing a checkout.
+        sleep(getRandomInt(1, 3))
+
+        // Marchant calls API to check if OTP exists without invalidating the code itself.
+        var tag = {
+            pagoPaMethod: "OtpCheckNoInvalidate",
+        };
+        var r = merchantOtpCheck(otp, 0, urlBaseMerchantPath, funcMerchantKey);
+        check(r, { 'status is 200': (r) => r.status === 200 }, tag);
+
+        // Simulate waiting for OTP usage by the merchant when processing checkout.
+        sleep(getRandomInt(1, 3))
+
+        // Marchant calls API to consume the OTP.
+        r = merchantOtpCheck(otp, 1, urlBaseMerchantPath, funcMerchantKey);
+        check(r, { 'status is 200': (r) => r.status === 200 }, tag);
+
+
     }
 
-    // OTP generation.
-    var url = `${urlBasePath}/api/v1/cgn/otp/${fiscalCode}`;
-    var funcKey = `${__ENV.FUNC_KEY}`
-    var otp = otpGeneration(fiscalCode, url, funcKey)
-
-
-    // Simulate waiting for OTP usage by the user when inserting the promo code while doing a checkout.
-    sleep(getRandomInt(1, 3))
-
-    // Marchant calls API to check if OTP exists without invalidating the code itself.
-    var tag = {
-        pagoPaMethod: "OtpCheckNoInvalidate",
-    };
-    var r = merchantOtpCheck(otp, 0, urlBaseMerchantPath, funcMerchantKey);
-    check(r, { 'status is 200': (r) => r.status === 200 }, tag);
-
-    // Simulate waiting for OTP usage by the merchant when processing checkout.
-    sleep(getRandomInt(1, 3))
-
-    // Marchant calls API to consume the OTP.
-    r = merchantOtpCheck(otp, 1, urlBaseMerchantPath, funcMerchantKey);
-    check(r, { 'status is 200': (r) => r.status === 200 }, tag);
-
     console.log('Test completed for: ' + fiscalCode + ' OTP: ' + otp);
+
 }
