@@ -100,7 +100,6 @@ export default function () {
         var r = merchantOtpCheck(otp, 0, urlBaseMerchantPath, funcMerchantKey);
         check(r, { 'status is 400': (r) => r.status === 400 }, tag);
         console.log('Test completed for: ' + fiscalCode + ' OTP: ' + otp);
-
     }
 
     // OTP generation.
