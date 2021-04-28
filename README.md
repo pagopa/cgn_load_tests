@@ -107,5 +107,5 @@ $ docker run -i --rm -v $(pwd)/src:/src  -e FUNC_KEY=${FUNC_KEY} -e BASE_URL=${B
 This test represents the usage of an OTP when doing a transacation with a supported merchant.
 
 ```
-$ docker run -i --rm -v $(pwd)/src:/src  -e FUNC_KEY=${FUNC_KEY} -e FUNC_MERCHANT_KEY=${FUNC_MERCHANT_KEY} -e BASE_URL=${BASE_URL} -e BASE_MERCHANT_URL=${BASE_MERCHANT_URL} loadimpact/k6 run /src/otp_workflow.js
+$ docker run -i --rm -v $(pwd)/src:/src  -e FUNC_KEY=${FUNC_KEY} -e SUBSCRIPTION_KEY=${SUBSCRIPTION_KEY} -e BASE_URL=${BASE_URL} loadimpact/k6 run /src/otp_workflow.js
 ```

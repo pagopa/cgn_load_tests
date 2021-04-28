@@ -1,4 +1,4 @@
-//docker run -i --rm -v $(pwd)/src:/src  -e FUNC_KEY=${FUNC_KEY} -e FUNC_MERCHANT_KEY=${FUNC_MERCHANT_KEY} -e BASE_URL=${BASE_URL} -e BASE_MERCHANT_URL=${BASE_MERCHANT_URL} loadimpact/k6 run /src/otp_workflow.js
+//docker run -i --rm -v $(pwd)/src:/src  -e FUNC_KEY=${FUNC_KEY} -e SUBSCRIPTION_KEY=${SUBSCRIPTION_KEY} -e BASE_URL=${BASE_URL} loadimpact/k6 run /src/otp_workflow.js
 
 import http from 'k6/http';
 import { sleep } from 'k6';
@@ -39,9 +39,9 @@ function otpGeneration(fiscalCode, url, funcKey) {
     return "";
 }
 
-function merchantOtpCheck(otp, invalidate, urlBaseMerchantPath, funcMerchantKey, tag) {
+function merchantOtpCheck(otp, invalidate, subscriptionKey, tag) {
 
-    var url = `${urlBaseMerchantPath}/api/v1/merchant/cgn/otp/validate`
+    var url = `https://api.io.italia.it/api/v1/merchant/cgn/otp/validate`
     var payload = JSON.stringify(
         {
             'otp_code': otp,
@@ -51,7 +51,7 @@ function merchantOtpCheck(otp, invalidate, urlBaseMerchantPath, funcMerchantKey,
     var headersParams = {
         headers: {
             'Content-Type': 'application/json',
-            'x-functions-key': funcMerchantKey
+            'Ocp-Apim-Subscription-Key': subscriptionKey
         },
     };
 
@@ -71,8 +71,8 @@ function getRandomInt(min, max) {
 export default function () {
     var funcKey = `${__ENV.FUNC_KEY}`
     var urlBasePath = `${__ENV.BASE_URL}`
-    var urlBaseMerchantPath = `${__ENV.BASE_MERCHANT_URL}`
-    var funcMerchantKey = `${__ENV.FUNC_MERCHANT_KEY}`
+    var subscriptionKey = `${__ENV.SUBSCRIPTION_KEY}`
+
     var otp = ""
 
     // Known code for testing puroposes.
@@ -88,7 +88,7 @@ export default function () {
             pagoPaMethod: "CacheMiss",
         };
         otp = "9NA3RWTCVSS"
-        var r = merchantOtpCheck(otp, 0, urlBaseMerchantPath, funcMerchantKey);
+        var r = merchantOtpCheck(otp, 0, subscriptionKey);
         check(r, { 'status is 404': (r) => r.status === 404 }, tag);
     }
     // Simulating an invalid OTP. Every 200 tests (more or less...).
@@ -99,7 +99,7 @@ export default function () {
             pagoPaMethod: "InvalidOtp",
         };
         otp = "invalid"
-        var r = merchantOtpCheck(otp, 0, urlBaseMerchantPath, funcMerchantKey);
+        var r = merchantOtpCheck(otp, 0, subscriptionKey);
         check(r, { 'status is 400': (r) => r.status === 400 }, tag);
     }
 
@@ -116,14 +116,14 @@ export default function () {
     var tag = {
         pagoPaMethod: "OtpCheckNoInvalidate",
     };
-    var r = merchantOtpCheck(otp, 0, urlBaseMerchantPath, funcMerchantKey);
+    var r = merchantOtpCheck(otp, 0, subscriptionKey);
     check(r, { 'status is 200': (r) => r.status === 200 }, tag);
 
     // Simulate waiting for OTP usage by the merchant when processing checkout.
     sleep(getRandomInt(1, 3))
 
     // Marchant calls API to consume the OTP.
-    r = merchantOtpCheck(otp, 1, urlBaseMerchantPath, funcMerchantKey);
+    r = merchantOtpCheck(otp, 1, subscriptionKey);
     check(r, { 'status is 200': (r) => r.status === 200 }, tag);
 
 
