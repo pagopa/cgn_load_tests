@@ -8,6 +8,7 @@ export let options = {
         contacts: {
             executor: 'constant-arrival-rate',
             rate: __ENV.rate, // e.g. 20000 for 20K iterations
+            timeUnit: '1s',
             duration: __ENV.duration, // e.g. '1m'
             preAllocatedVUs: __ENV.preAllocatedVUs, // e.g. 500
             maxVUs: __ENV.maxVUs // e.g. 1000
@@ -28,7 +29,7 @@ export default function () {
     var funcKey = `${__ENV.FUNC_KEY}`
 
     // Born in the ninenties.
-    var fiscalCode = generateFakeFiscalCode("9");
+    var fiscalCode = generateFakeFiscalCode("6");
     console.log('Fiscal code: ' + fiscalCode)
     var headersParams = {
         headers: {
