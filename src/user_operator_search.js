@@ -35,7 +35,7 @@ export default function () {
     var tag = {
         pagoPaMethod: "GetOnlineMerchants",
     };
-    var url = `${urlBasePath}/online-merchants`;
+    var url = `${urlBasePath}/api/v1/cgn/operator-search/online-merchants`;
     var payload = JSON.stringify({
 
     });
@@ -48,16 +48,16 @@ export default function () {
     check(r, { 'GetOnlineMerchants status is 200': (r) => r.status === 200 }, tag);
 
     var resultJsonBody = JSON.parse(r.body);
-    resultIds.push(resultJsonBody.items.map(el => el.id));
+    resultJsonBody.items.forEach(el => resultIds.push(el.id));
 
     tag = {
         pagoPaMethod: "GetOfflineMerchants",
     };
-    url = `${urlBasePath}/offline-merchants`;
+    url = `${urlBasePath}/api/v1/cgn/operator-search/offline-merchants`;
     r = http.post(url, payload, headersParams, {
         tags: tag,
     });
-    console.log('Serch for offline merchants status: ' + r.status);
+    console.log('Search for offline merchants status: ' + r.status);
     check(r, {
         'GetOfflineMerchants status 200': (r) => (r.status === 200)
     },
@@ -65,7 +65,7 @@ export default function () {
     );
 
     resultJsonBody = JSON.parse(r.body);
-    resultIds.push(resultJsonBody.items.map(el => el.id));
+    resultJsonBody.items.forEach(el => resultIds.push(el.id));
 
     //Simulating GetMerchant Detail.
     sleep(1);
@@ -75,10 +75,11 @@ export default function () {
     tag = {
         pagoPaMethod: "GetMerchant",
     };
-    url = `${urlBasePath}/merchants/${randomMerchantId}`;
+    url = `${urlBasePath}/api/v1/cgn/operator-search/merchants/${randomMerchantId}`;
     r = http.get(url, headersParams, {
         tags: tag,
     });
+    console.log('Get merchant detail: ' + r.status + ' with merchantId: ' + randomMerchantId);
     check(r, { 'Get Merchant is 200': (r) => (r.status === 200) },
         tag
     );
