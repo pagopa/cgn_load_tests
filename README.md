@@ -109,3 +109,12 @@ This test represents the usage of an OTP when doing a transacation with a suppor
 ```
 $ docker run -i --rm -v $(pwd)/src:/src  -e FUNC_KEY=${FUNC_KEY} -e SUBSCRIPTION_KEY=${SUBSCRIPTION_KEY} -e BASE_URL=${BASE_URL} loadimpact/k6 run /src/otp_workflow.js
 ```
+
+
+## 03. Operator Search
+
+This test represents the usage of merchant search and request detail.
+
+```
+$ docker run -i --rm -v $(pwd)/src:/src  -e OS_FUNC_KEY=${OS_FUNC_KEY} -e SUBSCRIPTION_KEY=${SUBSCRIPTION_KEY} -e OS_BASE_URL=${OS_BASE_URL} -e rate=${rate} -e duration=${duration} -e preAllocatedVUs=${preAllocatedVUs} -e maxVUs=${maxVUs} loadimpact/k6 run /src/user_operator_search.js
+```
